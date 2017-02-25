@@ -8,6 +8,7 @@ template<class T, class S> class RK4: public ODE_Solver<T,S>{
 		RK4(double tstart, double tend, int nsteps);
 		RK4(double tstart, double tend, double dt);
 		void Solve();
+		void Solve(Vector<double>&, Vector<T>&);
 		void Initialize(double,double,int);
 	
 	private:

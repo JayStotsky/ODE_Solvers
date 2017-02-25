@@ -7,9 +7,11 @@ template<class T, class S> class ODE_Solver
 	public:
 		ODE_Solver(){};
 		~ODE_Solver(){};
-		void GetOutput(Vector<double>&, Vector<T>& ) const;
+		void GetOutput(double&, T& ) const;
 		void SetInitialConditions(const T&);
-		virtual void Solve(){};
+		virtual void Solve(){}; //don't print results
+		virtual void Solve(Vector<double>&, Vector<T>&){}; //print results at every time step
+		virtual void Solve(Vector<double>&, Vector<T>&, Vector<int>&){}; //print results at certain time steps
 		void SetFunction(std::shared_ptr<S>);  
 		virtual void Initialize(){};
 		bool CheckStatus() const;
@@ -22,8 +24,8 @@ template<class T, class S> class ODE_Solver
 		
 		double T_start=0;
 		double T_end=0;
-		Vector<T> Y;
-		Vector<double> time;
+		T Y;
+		double time;
 		T Fty;
 		std::shared_ptr<S> Function;
 };

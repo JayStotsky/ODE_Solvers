@@ -90,10 +90,18 @@ template<class T> Vector<T>::~Vector()
 
 template<class T> void Vector<T>::SetDim(const int k)
 {
-	n=k;
-	v = new T[n];
-	for (int i =0; i<n; i++)
-		v[i] = static_cast<T>(0.);
+	if (n==0)
+	{
+		n=k;
+		v = new T[n];
+		for (int i =0; i<n; i++)
+			v[i] = static_cast<T>(0.);
+	}
+	else 
+	{
+		if (k!=n)
+			printf("Error, dimension already set\n");
+	}
 };
 
 template<class T> int Vector<T>::GetDim() const

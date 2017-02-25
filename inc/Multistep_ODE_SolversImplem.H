@@ -25,9 +25,6 @@ template<class T, class S> ForwardEuler<T,S>::ForwardEuler(double tstart, double
 		
 	if (this->T_end_set && Nsteps>0)
 		deltaT = (this->T_end-this->T_start)/(double)Nsteps;
-		
-	this->Y.SetDim(Nsteps+1);
-	this->time.SetDim(Nsteps+1);
 };
 
 template<class T, class S> ForwardEuler<T,S>::ForwardEuler(double tstart, double tend, double dt)
@@ -46,9 +43,6 @@ template<class T, class S> ForwardEuler<T,S>::ForwardEuler(double tstart, double
 		
 	if (this->T_end_set && deltaT>0)
 		Nsteps = floor((this->T_end-this->T_start)/dt);
-		
-	this->Y.SetDim(Nsteps+1);
-	this->time.SetDim(Nsteps+1);
 };
 
 template<class T, class S> void ForwardEuler<T,S>::Initialize(double tstart, double tend, int nsteps)
@@ -64,26 +58,47 @@ template<class T, class S> void ForwardEuler<T,S>::Initialize(double tstart, dou
 	
 	if (nsteps>0)
 		Nsteps = nsteps;
-		
-	this->Y.SetDim(Nsteps+1);
-	this->time.SetDim(Nsteps+1);
 };
 
 template<class T, class S> void ForwardEuler<T,S>::Solve()
 {
 	if (this->CheckStatus())
 	{	
-		this->time(0) = this->T_start;
 		for (int t = 0; t<Nsteps; t++)
 		{
-			this->time(t+1) = this->time(t)+deltaT;
-			this->Function->eval(this->time(t),this->Y(t),this->Fty);
-			this->Y(t+1) = this->Y(t)+(deltaT*this->Fty);
-			if (typeid(this->Y(t+1))==typeid(Vector<double>))
+			this->Function->eval(this->time,this->Y,this->Fty);
+			this->Y = this->Y+(deltaT*(this->Fty));
+			this->time = this->time+deltaT;
+		}
+	}
+	this->SolverDone = 1;
+}
+
+template<class T, class S> void ForwardEuler<T,S>::Solve(Vector<double>& Time, Vector<T>& Solution)
+{
+	if (this->CheckStatus())
+	{	
+		for (int t = 0; t<Nsteps; t++)
+		{	
+			if (Time.GetDim()==0 || Solution.GetDim()==0)
 			{
-				Vector<double> V = this->Y(t+1);
-				printf("%f %f %d\n", V(0),V(1),V.GetDim());
+				Time.SetDim(Nsteps+1);
+				Solution.SetDim(Nsteps+1);
 			}
+			
+			if (t==0)
+			{
+				Time(0) = this->T_start;
+				Solution(0) = this->Y;
+			}
+			
+			this->Function->eval(this->time,this->Y,this->Fty);
+			this->Y = this->Y+(deltaT*(this->Fty));
+			this->time = this->time+deltaT;
+			
+			
+			Time(t+1) = this->time;
+			Solution(t+1) = this->Y;
 		}
 	}
 	this->SolverDone = 1;

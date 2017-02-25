@@ -7,7 +7,7 @@
 #include <memory>
 #include "Vector.H"
 
-template<class T, class S> void ODE_Solver<T,S>::GetOutput(Vector<double>& Time, Vector<T>& Solution) const 
+template<class T, class S> void ODE_Solver<T,S>::GetOutput(double& Time, T& Solution) const 
 {
 	if (SolverDone)
 	{
@@ -32,8 +32,9 @@ template<class T, class S> void ODE_Solver<T,S>::SetInitialConditions(const T& Y
 {
 	if (CheckStatus())
 	{
-		time(0) = T_start;
-		Y(0) = Y0;
+		time = T_start;
+		Y = Y0;
+		Fty = Y0;
 	}
 	
 };
