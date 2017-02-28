@@ -9,7 +9,7 @@
 #include "ODE_Solver.H"
 
 
-template<class T, class S> ForwardEuler<T,S>::ForwardEuler(double tstart, double tend, int nsteps)
+template<class T> FixedStep_ODE_Solver<T>::FixedStep_ODE_Solver(double tstart, double tend, int nsteps)
 {
 	this->T_start = tstart;
 	this->T_start_set = 1;	
@@ -19,9 +19,10 @@ template<class T, class S> ForwardEuler<T,S>::ForwardEuler(double tstart, double
 	
 	Nsteps = nsteps;
 	deltaT = (this->T_end-this->T_start)/(double)Nsteps;
+	ready = 1;
 };
 
-template<class T, class S> ForwardEuler<T,S>::ForwardEuler(double tstart, double tend, double dt)
+template<class T> FixedStep_ODE_Solver<T>::FixedStep_ODE_Solver(double tstart, double tend, double dt)
 {
 	this->T_start = tstart;
 	this->T_start_set = 1;	
@@ -31,9 +32,11 @@ template<class T, class S> ForwardEuler<T,S>::ForwardEuler(double tstart, double
 	
 	deltaT = dt;	
 	Nsteps = floor((this->T_end-this->T_start)/dt);
+	
+	ready = 1;
 };
 
-template<class T, class S> void ForwardEuler<T,S>::Initialize(double tstart, double tend, double dt)
+template<class T> void FixedStep_ODE_Solver<T>::Initialize(double tstart, double tend, double dt)
 {
 	this->T_start = tstart;
 	this->T_start_set = 1;
@@ -43,9 +46,11 @@ template<class T, class S> void ForwardEuler<T,S>::Initialize(double tstart, dou
 	
 	deltaT = dt;
 	Nsteps = floor((tend-tstart)/dt);
+	
+	ready = 1;
 };
 
-template<class T, class S> void ForwardEuler<T,S>::Initialize(double tstart, double tend, int nsteps)
+template<class T> void FixedStep_ODE_Solver<T>::Initialize(double tstart, double tend, int nsteps)
 {
 	this->T_start = tstart;
 	this->T_start_set = 1;
@@ -55,20 +60,22 @@ template<class T, class S> void ForwardEuler<T,S>::Initialize(double tstart, dou
 	
 	Nsteps = nsteps;
 	deltaT = (tend-tstart)/(double)nsteps;
+	
+	ready =1;
 };
 
 
-template<class T, class S> void ForwardEuler<T,S>::Solve()
+template<class T> void FixedStep_ODE_Solver<T>::Solve()
 {
-	if (this->CheckStatus())
+	if (this->CheckStatus() && ready)
 		for (int t = 0; t<Nsteps; t++)
 			StepForward();
 	this->SolverDone = 1;
 }
 
-template<class T, class S> void ForwardEuler<T,S>::Solve(Vector<double>& Time, Vector<T>& Solution)
+template<class T> void FixedStep_ODE_Solver<T>::Solve(Vector<double>& Time, Vector<T>& Solution)
 {
-	if (this->CheckStatus())
+	if (this->CheckStatus() && ready)
 	{	
 		for (int t = 0; t<Nsteps; t++)
 		{	
@@ -90,10 +97,3 @@ template<class T, class S> void ForwardEuler<T,S>::Solve(Vector<double>& Time, V
 	}
 	this->SolverDone = 1;
 }
-
-template<class T, class S> void ForwardEuler<T,S>::StepForward()
-{
-	this->Function->eval(this->time,this->Y,this->Fty);
-	this->Y = this->Y+(deltaT*(this->Fty));
-	this->time = this->time+deltaT;
-};

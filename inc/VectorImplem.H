@@ -100,7 +100,14 @@ template<class T> void Vector<T>::SetDim(const int k)
 	else 
 	{
 		if (k!=n)
-			printf("Error, dimension already set\n");
+		{	
+			delete [] v;
+			n=k;
+			v = new T[n];
+			for (int i =0; i<n; i++)
+				v[i] = static_cast<T>(0.);
+			printf("Warning,  dimension already set, reallocating and setting to zero\n");
+		}
 	}
 };
 
@@ -295,7 +302,7 @@ template<class T> void Vector<T>::Append(const int m)
 	delete [] v_temp;
 };
 
-template<class T> Vector<T> operator*(double r, Vector<T>& A)
+template<class T> Vector<T> operator*(double r, Vector<T> A)
 {
 	Vector<T> B = A*r;
 	return B;

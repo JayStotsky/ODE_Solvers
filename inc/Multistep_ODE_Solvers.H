@@ -10,7 +10,9 @@ template<class T, class S> class ForwardEuler: public ODE_Solver<T,S>{
 		void Solve();
 		void Solve(Vector<double>&, Vector<T>&);
 		void Initialize(double,double,int);
-	
+		void Initialize(double,double,double);
+		void StepForward();
+		
 	private:
 		int Nsteps=0;
 		double deltaT=0;
